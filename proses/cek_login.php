@@ -5,29 +5,61 @@ include '../config/koneksi.php';
 $username = $_POST['username'];
 $password = $_POST['password'];
 
-$data = mysqli_query($koneksi,"SELECT * FROM admin WHERE username='$username'");
-$cek = mysqli_num_rows($data);
+// ====================================================
+// 1. CEK UNTUK ADMIN (Tabel admin)
+// ====================================================
+$login_admin = mysqli_query($koneksi, "SELECT * FROM admin WHERE username='$username'");
+$cek_admin = mysqli_num_rows($login_admin);
 
-if($cek > 0){
-    $row = mysqli_fetch_assoc($data);
+if($cek_admin > 0){
+    $row = mysqli_fetch_assoc($login_admin);
 
     if(password_verify($password, $row['password'])){
         
-        // SESSION YANG DIPAKAI DASHBOARD
+        // SET SESSION ADMIN
         $_SESSION['id_admin']   = $row['id_admin'];
         $_SESSION['username']   = $row['username'];
         $_SESSION['nama_admin'] = $row['nama_lengkap'];
-        $_SESSION['nip']        = $row['nip'];
+        
+        // PASTIIN INI ADA (Agar NIP Admin terbaca)
+        $_SESSION['nip']        = $row['nip']; 
+        
+        $_SESSION['level']      = "admin"; 
         $_SESSION['status']     = "login";
 
         header("location:../index.php");
         exit;
-    } else {
-        header("location:../login.php?pesan=gagal");
+    }
+}
+
+// ====================================================
+// 2. CEK UNTUK PETUGAS/PIMPINAN (Tabel pengguna)
+// ====================================================
+$login_pengguna = mysqli_query($koneksi, "SELECT * FROM pengguna WHERE username='$username'");
+$cek_pengguna = mysqli_num_rows($login_pengguna);
+
+if($cek_pengguna > 0){
+    $row = mysqli_fetch_assoc($login_pengguna);
+
+    if(password_verify($password, $row['password'])){
+        
+        // SET SESSION PETUGAS/PIMPINAN
+        $_SESSION['id_pengguna'] = $row['id_pengguna'];
+        $_SESSION['username']    = $row['username'];
+        $_SESSION['nama_admin']  = $row['nama_lengkap']; 
+        
+        // PASTIIN INI JUGA ADA (Agar NIP Petugas terbaca)
+        $_SESSION['nip']         = $row['nip']; 
+        
+        $_SESSION['level']       = $row['level']; 
+        $_SESSION['status']      = "login";
+
+        header("location:../index.php");
         exit;
     }
-} else {
-    header("location:../login.php?pesan=gagal");
-    exit;
 }
+
+// Jika gagal di kedua tabel
+header("location:../login.php?pesan=gagal");
+exit;
 ?>

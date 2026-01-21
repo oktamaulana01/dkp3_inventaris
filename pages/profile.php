@@ -3,8 +3,19 @@ include '../layout/header.php';
 include '../layout/sidebar.php'; 
 include '../config/koneksi.php';
 
-$id_admin = $_SESSION['id_admin']; // Pastikan ID tersimpan di session saat login
-$query = mysqli_query($koneksi, "SELECT * FROM admin WHERE id_admin = '$id_admin'");
+// --- LOGIKA DETEKSI USER (Admin vs Pengguna) ---
+$level = $_SESSION['level'];
+
+if ($level == 'admin') {
+    // Jika Admin, ambil dari tabel 'admin'
+    $id_user = $_SESSION['id_admin'];
+    $query   = mysqli_query($koneksi, "SELECT * FROM admin WHERE id_admin = '$id_user'");
+} else {
+    // Jika Petugas/Pimpinan, ambil dari tabel 'pengguna'
+    $id_user = $_SESSION['id_pengguna'];
+    $query   = mysqli_query($koneksi, "SELECT * FROM pengguna WHERE id_pengguna = '$id_user'");
+}
+
 $data = mysqli_fetch_assoc($query);
 ?>
 
@@ -19,37 +30,46 @@ $data = mysqli_fetch_assoc($query);
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="card shadow-sm">
+                    <div class="card shadow-sm border-0">
                         <div class="card-header bg-white">
-                            <h3 class="card-title">Edit Username & Password</h3>
+                            <h3 class="card-title fw-bold">Edit Profil Saya</h3>
                         </div>
                         <form action="../proses/profile_proses.php" method="POST">
                             <div class="card-body">
-                                <?php if(isset($_GET['pesan']) && $_GET['pesan'] == 'sukses'): ?>
-                                    <div class="alert alert-success">Profil berhasil diperbarui!</div>
+                                
+                                <?php if(isset($_GET['pesan'])): ?>
+                                    <?php if($_GET['pesan'] == 'sukses'): ?>
+                                        <div class="alert alert-success">Profil berhasil diperbarui!</div>
+                                    <?php elseif($_GET['pesan'] == 'gagal'): ?>
+                                        <div class="alert alert-danger">Gagal memperbarui profil.</div>
+                                    <?php endif; ?>
                                 <?php endif; ?>
 
                                 <div class="mb-3">
                                     <label class="form-label">Nama Lengkap</label>
                                     <input type="text" name="nama_lengkap" class="form-control" value="<?= $data['nama_lengkap'] ?>" required>
                                 </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">NIP</label>
+                                    <input type="text" class="form-control bg-light" value="<?= isset($data['nip']) ? $data['nip'] : '-' ?>" disabled>
+                                    <small class="text-muted fst-italic">*Hubungi Admin jika ingin mengubah NIP</small>
+                                </div>
+
                                 <div class="mb-3">
                                     <label class="form-label">Username</label>
                                     <input type="text" name="username" class="form-control" value="<?= $data['username'] ?>" required>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">NIP</label>
-                                    <input type="text" class="form-control" value="<?= $data['nip'] ?>" disabled>
-                                    <small class="text-muted text-italic">*NIP tidak dapat diubah</small>
-                                </div>
+                                
                                 <hr>
                                 <div class="mb-3">
-                                    <label class="form-label">Password Baru</label>
-                                    <input type="password" name="password_baru" class="form-control" placeholder="Kosongkan jika tidak ingin ganti">
+                                    <label class="form-label text-primary fw-bold">Ganti Password</label>
+                                    <input type="password" name="password_baru" class="form-control" placeholder="Kosongkan jika tidak ingin ganti password">
+                                    <small class="text-muted">Biarkan kosong jika password tidak ingin diubah.</small>
                                 </div>
                             </div>
-                            <div class="card-footer bg-white">
-                                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                            <div class="card-footer bg-white text-end">
+                                <button type="submit" name="update_profil" class="btn btn-primary">Simpan Perubahan</button>
                             </div>
                         </form>
                     </div>

@@ -93,9 +93,6 @@
             <h2 class="text-primary-green fw-bold mb-2">
                 <i class="bi bi-speedometer2 me-2"></i>Dashboard
             </h2>
-            <p class="text-muted mb-0">
-            Selamat datang, <strong><?= $_SESSION['nama_admin']; ?></strong>!
-        </p>
         </div>
         <div>
             <span class="badge badge-date text-white">
@@ -199,7 +196,8 @@
                 </div>
             </div>
         </div>
-        
+
+        <?php if($_SESSION['level'] != 'pimpinan') : ?>
         <div class="col-md-4">
             <div class="card border-0 shadow-sm chart-card h-100">
                 <div class="card-header card-header-custom py-3">
@@ -222,6 +220,7 @@
                         <a href="pages/barang.php" class="btn btn-quick-access btn-outline-primary text-start p-3">
                             <i class="bi bi-box-seam me-2"></i> Kelola Data Barang
                         </a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

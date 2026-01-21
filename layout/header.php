@@ -36,7 +36,7 @@ if($_SESSION['status'] != "login"){
         .sidebar { 
             min-height: 100vh; 
             /* Gradasi Warna Biru Tua Elegan */
-            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(180deg, #1e7256 0%, #1e7256 100%);
             color: white; 
             width: 260px; /* Sedikit lebih lebar */
             flex-shrink: 0; 
